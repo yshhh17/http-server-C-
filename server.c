@@ -23,10 +23,12 @@ void* client_handler(void* arg) {
 	free(arg);
 
 	char buffer[1024];
+	char *initial = ">> ";
+	write(client_fd, initial, strlen(initial));
 
 	while(1) {
 		memset(buffer, 0, sizeof(buffer));
-		int bytes_read = read(client, buffer, sizeof(buffer)-1);
+		int bytes_read = read(client_fd, buffer, sizeof(buffer)-1);
 		
 		if (bytes_read <=0) {
 			printf("client disconnected\n");
@@ -45,6 +47,8 @@ void* client_handler(void* arg) {
 		broadcast_to_all(client_fd, buffer);
 
 	}
+	close(client_fd);
+}
 
 int main() {
 	int server_fd;
@@ -55,6 +59,12 @@ int main() {
 		.sin_port = htons(4231),
 		.sin_addr = { htonl(INADDR_ANY) },
 	};
+
+	int reuse = 1;
+	if(setsockopt(server_fd, SOL_SOCKET, SO_REUSEADDR, &reuse, sizeof(reuse)) < 0) {
+		printf("SO_REUSEADDR failed: %s\n", strerror(errno));
+		return 2;
+	}
 
 	if (bind(server_fd, (struct sockaddr *) &server_address, sizeof(server_address)) == -1) {
 			fprintf(stderr, "error binding the socket %s\n", strerror(errno));
