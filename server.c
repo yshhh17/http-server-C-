@@ -23,8 +23,8 @@ void* client_handler(void* arg) {
 	free(arg);
 
 	char buffer[1024];
-	char *initial = ">> ";
-	write(client_fd, initial, strlen(initial));
+	//char *initial = ">> ";
+	//write(client_fd, initial, strlen(initial));
 
 	while(1) {
 		memset(buffer, 0, sizeof(buffer));
@@ -78,13 +78,18 @@ int main() {
 	}
 
 	struct sockaddr_in client_address[2];
-	int client_add_len = sizeof(client_address);
+	//int client_add_len = sizeof(client_address);
 
 	for (int i=0;i<2;i++) {
+		int client_add_len = sizeof(client_address[i]);
 		client_fds[i] = accept(server_fd, (struct sockaddr *) &client_address[i], &client_add_len);
 		if (client_fds[i] < 0) {
 			fprintf(stderr, "error in accepting %s\n", strerror(errno));
 		}
+
+		char* greeting = "you are connected to the server\n";
+		write(client_fds[i], greeting, strlen(greeting));
+
 		int *fd_ptr = malloc(sizeof(int));
 		*fd_ptr = client_fds[i];
 

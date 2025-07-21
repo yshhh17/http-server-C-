@@ -13,8 +13,13 @@ void* msg_handler(void* arg) {
 	while (1) {
 		memset(buffer, 0, sizeof(buffer));
 		int bytes_read = read(client_fd, buffer, sizeof(buffer)-1);
-		if(bytes_read <=0) {
-			printf("client disconnected\n");
+		if(bytes_read == 0) {
+			printf("server closed connection\n");
+			break;
+		}
+
+		if(bytes_read < 0) {
+			printf("read failed\n");
 			break;
 		}
 
@@ -22,6 +27,7 @@ void* msg_handler(void* arg) {
 		printf("\n>> %s\n", buffer);
 	}
 	close(client_fd);
+	return NULL;
 }
 
 int main() {
@@ -45,6 +51,19 @@ int main() {
 		fprintf(stderr, "error connecting to server: %s\n", strerror(errno));
 		return 3;
 	}
+
+	printf("connected to the server\n");
+
+	char welcome[1024];
+	int n = read(client_fd, welcome, sizeof(welcome)-1);
+
+	if(n > 0) {
+		welcome[n] = '\0';
+		printf("%s", welcome);
+	} else {
+		return 1;
+	}
+
 	int *fd_p = malloc(sizeof(int));
 	*fd_p = client_fd;
 
