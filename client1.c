@@ -24,7 +24,7 @@ void* msg_handler(void* arg) {
 		}
 
 		buffer[bytes_read] = '\0';
-		printf("\n>> %s\n", buffer);
+		printf(">> %s\n", buffer);
 	}
 	close(client_fd);
 	return NULL;
