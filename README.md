@@ -22,5 +22,3 @@ A simple terminal-based chat application built in **C** using sockets and multit
   ```bash
    gcc client1.c -o server
    ./client
-
-
